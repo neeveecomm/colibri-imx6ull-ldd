@@ -1,0 +1,160 @@
+#include <linux/init.h>
+#include <linux/module.h>
+#include <linux/kdev_t.h>
+#include <linux/fs.h>
+#include <linux/device.h>
+#include <linux/cdev.h>
+#include <uapi/linux/poll.h>
+#include <linux/ioctl.h>
+
+#define WRITE_VALUE _IOW('a','a',int)
+#define READ_VALUE _IOR('a','b',int)
+
+#define DYNAMIC_ALLC 1
+
+static dev_t first;
+static struct class *chrdevcls;
+
+static struct cdev *chrdev;
+
+int value = 0;
+
+
+/*****************************************************/
+
+static int chrdev_open(struct inode *node, struct file *filp)                    //open file
+{
+	printk(KERN_INFO "device file is opened \n");
+	return 0;
+}
+static int chrdev_release(struct inode *node, struct file *filp)                  //release
+{
+        printk(KERN_INFO "device file is closed \n");
+        return 0;
+}
+
+static ssize_t chrdev_read(struct file *filp, char __user *buf, size_t len, loff_t *offset)  //read
+{
+	char data[64] = "hello world\n";
+	printk(KERN_INFO "Read from device file \n");
+	if(copy_to_user(buf,data,12)==0){
+		return 12;
+	}
+	return -1;
+}
+static ssize_t chrdev_write(struct file *filp, const char __user *buf, size_t len, loff_t *offset)   //write
+{
+	char data[64] = {0};
+	if(copy_from_user(data,buf,len)==0){
+        printk(KERN_INFO "write to the device file : %s \n",data);
+        return len;
+	}
+	return -1;
+}
+
+static __poll_t chrdev_poll(struct file *file, struct poll_table_struct *pt)                     //poll
+{
+        return POLLIN | POLLOUT; 
+}
+
+/* This function will be called when we write IOCTL on the Device file */
+
+static long chrdev_ioctl(struct file *file, unsigned int command, unsigned long arg)
+{
+	switch(command){
+		case WRITE_VALUE:
+			if(copy_from_user(&value,(int *) arg, sizeof(value)))
+			{
+				pr_err("Data Write : Err!\n");
+			}
+			printk(KERN_INFO "value = %d\n",value);
+			break;
+		case READ_VALUE:
+			if(copy_to_user((int *)arg, &value, sizeof(value)))
+			{
+				pr_err("Data Read : Err!\n");
+			}
+			break;
+		default:
+			printk(KERN_INFO "Default \n");
+			break;
+	}
+	return 0;
+}
+/* File operation sturcture */
+
+static struct file_operations chrdev_fops = {
+        .owner = THIS_MODULE,
+        .open = chrdev_open,
+        .release = chrdev_release,
+        .read = chrdev_read,
+        .write = chrdev_write,
+	.poll = chrdev_poll,
+	.unlocked_ioctl = chrdev_ioctl,
+};
+
+/*********************** Module init function ******************/
+static int chardrv_init(void)
+{
+	int ret;
+#ifdef DYNAMIC_ALLC
+	ret = alloc_chrdev_region(&first,0,1,"chardevice");
+#else
+	first = MKDEV(240,0);
+	ret = register_chrdev_region(first,1,"chardevice");
+#endif
+	if(ret < 0){
+		printk(KERN_INFO "register for chardevice is failed : %d\n",ret);
+		return ret; }
+	printk(KERN_DEBUG "register for chardevice region is success \n");
+
+	chrdevcls = class_create(THIS_MODULE, "chardevice");
+
+	if(chrdevcls == NULL){
+		printk(KERN_INFO "class creation is failed \n");
+		goto cleanupcls;
+	}
+
+	if(device_create(chrdevcls,NULL,first,NULL,"chardevice")==NULL){
+		printk(KERN_INFO "Device creation is failed \n");
+		goto cleanupdevice;
+	}
+
+	chrdev = cdev_alloc();
+	if(chrdev == NULL){
+		printk(KERN_INFO "cdev allocation is failed \n");
+		goto cleanup_device; }
+
+	cdev_init(chrdev,&chrdev_fops);
+	cdev_add(chrdev, first, 1);
+
+
+	pr_info("Device driver insert has done \n");
+
+	return 0;
+
+cleanup_device:
+        device_destroy(chrdevcls,first);
+cleanupcls:
+	class_destroy(chrdevcls);
+cleanupdevice:
+	unregister_chrdev_region(first,1);
+	return -1;
+
+}
+
+/*************************** Module exit function ******************************/
+static void chardrv_exit(void)
+{
+	printk(KERN_INFO "The module removed successfully \n");
+	cdev_del(chrdev);
+	device_destroy(chrdevcls,first);
+	class_destroy(chrdevcls);
+	unregister_chrdev_region(first,1);
+	return;
+}
+
+module_init(chardrv_init);
+module_exit(chardrv_exit);
+
+MODULE_LICENSE("GPL");

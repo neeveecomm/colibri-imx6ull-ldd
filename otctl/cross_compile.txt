@@ -1,0 +1,4 @@
+To cross compile the chrapp.c file use this command.
+
+arm-linux-gnueabihf-gcc -o chrapp chrapp.c
+

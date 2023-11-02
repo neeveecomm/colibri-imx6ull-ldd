@@ -1,0 +1,381 @@
+diff --git a/arch/arm/boot/dts/imx6ul-kontron-sl-common.dtsi b/arch/arm/boot/dts/imx6ul-kontron-sl-common.dtsi
+index dcf88f610346..aee947308cb5 100644
+--- a/arch/arm/boot/dts/imx6ul-kontron-sl-common.dtsi
++++ b/arch/arm/boot/dts/imx6ul-kontron-sl-common.dtsi
+@@ -88,7 +88,7 @@ pinctrl_ecspi2: ecspi2grp {
+ 			MX6UL_PAD_CSI_DATA03__ECSPI2_MISO      0x100b1
+ 			MX6UL_PAD_CSI_DATA02__ECSPI2_MOSI      0x100b1
+ 			MX6UL_PAD_CSI_DATA00__ECSPI2_SCLK      0x100b1
+-			MX6UL_PAD_CSI_DATA01__GPIO4_IO22       0x100b1
++			MX6UL_PAD_CSI_DATA01__GPIO4_IO22       0x100b1   
+ 		>;
+ 	};
+ 
+diff --git a/arch/arm/boot/dts/imx6ul-tx6ul.dtsi b/arch/arm/boot/dts/imx6ul-tx6ul.dtsi
+index 15ee0275feaf..262625bb1908 100644
+--- a/arch/arm/boot/dts/imx6ul-tx6ul.dtsi
++++ b/arch/arm/boot/dts/imx6ul-tx6ul.dtsi
+@@ -845,7 +845,7 @@ MX6UL_PAD_UART4_TX_DATA__GPIO1_IO28	0x0b0b0 /* CSPI_SCLK */
+ 
+ 	pinctrl_tsc2007: tsc2007grp {
+ 		fsl,pins = <
+-			MX6UL_PAD_JTAG_TMS__GPIO1_IO11		0x1b0b0 /* Interrupt */
++			MX6UL_PAD_JTAG_TMS__GPIO1_IO11		0x1b0b0      /* Interrupt */   
+ 		>;
+ 	};
+ 
+diff --git a/arch/arm/boot/dts/imx6ull-colibri-emmc-eval-v3.dts b/arch/arm/boot/dts/imx6ull-colibri-emmc-eval-v3.dts
+index 61b93cb040c7..8e5ba6f7b3c4 100644
+--- a/arch/arm/boot/dts/imx6ull-colibri-emmc-eval-v3.dts
++++ b/arch/arm/boot/dts/imx6ull-colibri-emmc-eval-v3.dts
+@@ -9,7 +9,7 @@
+ #include "imx6ull-colibri-eval-v3.dtsi"
+ 
+ / {
+-	model = "Toradex Colibri iMX6ULL 1GB (eMMC) on Colibri Evaluation Board V3";
++	model = "Toradex Colibri iMX6ULL 1GB (eMMC) on Colibri Evaluation Board V3 LDD";
+ 	compatible = "toradex,colibri-imx6ull-emmc-eval",
+ 		     "toradex,colibri-imx6ull-emmc",
+ 		     "toradex,colibri-imx6ull",
+diff --git a/arch/arm/boot/dts/imx6ull-colibri-wifi-eval-v3.dts b/arch/arm/boot/dts/imx6ull-colibri-wifi-eval-v3.dts
+index 1d64d1a5d8a7..0f1c84ec7be3 100644
+--- a/arch/arm/boot/dts/imx6ull-colibri-wifi-eval-v3.dts
++++ b/arch/arm/boot/dts/imx6ull-colibri-wifi-eval-v3.dts
+@@ -11,4 +11,139 @@
+ / {
+ 	model = "Toradex Colibri iMX6ULL 512MB on Colibri Evaluation Board V3";
+ 	compatible = "toradex,colibri-imx6ull-wifi-eval", "fsl,imx6ull";
++       
++   /*     shield_led {
++              compatible = "led_gpio_sysfs";
++              
++               led-green {
++                       label = "green-led";
++                       pinctrl-name = "default";
++		       pinctrl-0 = <&led_gpio122>;
++                       imx6ull-gpios = <&gpio4 26 GPIO_ACTIVE_HIGH>;
++                       status = "okay"; 
++                       };
++
++                led-red {
++                       label = "red-led";
++                       pinctrl-name = "default";
++                       pinctrl-0 = <&led_gpio11>;
++                       imx6ull-gpios = <&gpio4 28 GPIO_ACTIVE_HIGH>;
++                       status = "okay";
++                       };
++
++               led-blue {
++                       label = "blue-led";
++                       pinctrl-name = "default";
++                       pinctrl-0 = <&led_gpio118>;
++                       imx6ull-gpios = <&gpio4 27 GPIO_ACTIVE_HIGH>;
++                       status = "okay";
++                       };
++
++        };  */
++  
++leds {
++
++              compatible = "gpio-leds";
++              pinctrl-names = "default";
++              pinctrl-0 = <&pinctrl_gpio_leds>;
++
++               led0: red {
++                           label = "red";
++                           gpios = <&gpio1 11 GPIO_ACTIVE_HIGH>; 
++                           default-state = "off";
++                           linux,default-trigger = "mmc0";
++                           };
++               led1: green {
++                           label = "green";
++                           gpios = <&gpio4 26 GPIO_ACTIVE_HIGH>; 
++                           default-state = "off";
++                           linux,default-trigger = "mmc0";
++                           };
++                led2: blue {
++                           label = "blue";
++                           gpios = <&gpio4 22 GPIO_ACTIVE_HIGH>; 
++                           default-state = "off";
++                           linux,default-trigger = "caps-lock";
++                           };   
++     };
++/*
++switch_led {
++
++              compatible = "switch-led";
++              pinctrl-names = "default";
++              pinctrl-0 = <&pinctrl_sw_led>;
++
++               sw1: sw_1 {
++                           label = "sw-1";
++                           gpios = <&gpio4 14 GPIO_ACTIVE_HIGH>;
++                           output-high;
++                           debounce-interval = <10>;
++                           };
++               led01: led_1 {
++                           label = "led-1";
++                           gpios = <&gpio2 0 GPIO_ACTIVE_HIGH>;
++                           };
++}; */
++
++};
++/*
++&i2c1 {
++    si7020@40 {
++        compatible = "silabs,si7020";
++        reg = <0x40>;
++    };
++};
++*/
++&backlight{
++          status = "disabled";
++};
++
++&ecspi2 {
++       status = "disabled";
+ };
++
++&usdhc2 {
++       status = "disabled";
++};
++
++&usdhc1 {
++       status = "disabled";
++};
++
++&iomuxc {
++/* led_gpio122: led_gpio_122 {
++                fsl,pins = <
++                     MX6UL_PAD_CSI_DATA05__GPIO4_IO26        0x10b0
++                 >;
++        };
++led_gpio11: led_gpio_11 {
++                fsl,pins = <
++                     MX6UL_PAD_CSI_DATA07__GPIO4_IO28        0x10b0
++                 >;
++        };
++led_gpio118: led_gpio_118 {
++                fsl,pins = <
++                     MX6UL_PAD_CSI_DATA06__GPIO4_IO27        0x10b0 
++                 >;
++        };    */
++
++pinctrl_gpio_leds: gpioleds {
++                fsl,pins = <
++                     MX6UL_PAD_JTAG_TMS__GPIO1_IO11          0x30a0    /*red*/
++                     MX6UL_PAD_CSI_DATA01__GPIO4_IO22        0xd8b9     /*blue*/
++                /*   MX6UL_PAD_CSI_DATA06__GPIO4_IO27        0x10b0  */
++                     MX6UL_PAD_CSI_DATA05__GPIO4_IO26        0x08b9    /*green*/
++                 >;
++};
++
++/*
++pinctrl_sw_led: sw_led{
++              fsl,pins = <
++                     MX6UL_PAD_NAND_CE1_B__GPIO4_IO14        0xf000             
++		     MX6UL_PAD_ENET1_RX_DATA0__GPIO2_IO00    0x10b0             
++               >;
++}; */
++
++
++};
++
+diff --git a/arch/arm/boot/dts/imx6ull-colibri.dtsi b/arch/arm/boot/dts/imx6ull-colibri.dtsi
+index 577a424b0e1d..5b9c87d84049 100644
+--- a/arch/arm/boot/dts/imx6ull-colibri.dtsi
++++ b/arch/arm/boot/dts/imx6ull-colibri.dtsi
+@@ -21,8 +21,8 @@ backlight: backlight {
+ 		pinctrl-0 = <&pinctrl_gpio_bl_on>;
+ 		power-supply = <&reg_3v3>;
+ 		pwms = <&pwm4 0 5000000 1>;
+-		status = "okay";
+-	};
++		status = "okay"; 
++	};  
+ 
+ 	gpio-keys {
+ 		compatible = "gpio-keys";
+@@ -40,7 +40,7 @@ wakeup {
+ 
+ 	panel_dpi: panel-dpi {
+ 		compatible = "edt,et057090dhu";
+-		backlight = <&backlight>;
++		backlight = <&backlight>;  
+ 		power-supply = <&reg_3v3>;
+ 		status = "okay";
+ 
+@@ -172,6 +172,57 @@ atmel_mxt_ts: touchscreen@4a {
+ 		reset-gpios = <&gpio1 10 GPIO_ACTIVE_LOW>;    /* SODIMM 106 / RST */
+ 		status = "disabled";
+ 	};
++
++       si7020: si7020@40 {
++        compatible = "silabs,si7020";
++        reg = <0x40>;
++        status = "disabled";
++        };
++     
++       mma8652: mma8652@1d {
++        compatible = "fsl,mma8652";
++        reg = <0x1d>; 
++        interrupt-parent = <&gpio2>;
++        interrupts = <6 IRQ_TYPE_EDGE_FALLING>;
++        status = "disabled";
++        };
++
++       mcp4725: mcp4725@64 {
++        compatible = "microchip,mcp4725";
++        reg = <0x64>;
++        status = "okay";
++        };
++
++       tca8418_keypad: tca8418_keypad@34 {
++        compatible = "ti,tca8418";
++        pinctrl-name = "default";
++        pinctrl-0 = <&intr_key_gpio4>;
++        reg = <0x34>;
++        interrupt-parent = <&gpio4>;
++        interrupts = <14 IRQ_TYPE_LEVEL_HIGH>;
++        keypad,num-rows = <4>;
++	keypad,num-columns = <4>;
++        linux,keymap = <
++                        0x00000030 
++    			0x00010031 
++    			0x00020032 
++    			0x00030033 
++    			0x01000034 
++    			0x01010035 
++    			0x01020036 
++    			0x01030037 
++    			0x02000038 
++    			0x02010039 
++    			0x02020040 
++    			0x02030041 
++    			0x03000042 
++    			0x03010043 
++    			0x03020045 
++    			0x03030046 
++			>;
++        status = "okay";
++        };
++
+ };
+ 
+ /*
+@@ -311,6 +362,13 @@ &wdog1 {
+ };
+ 
+ &iomuxc {
++        intr_key_gpio4: intr_gpio4_16 {                                  /*keypad INT*/
++                fsl,pins = <
++                      /*   MX6UL_PAD_NAND_DQS__GPIO4_IO16          0x100b0 */   /* SODIMM 28 */   /*deepak*/ 
++                           MX6UL_PAD_NAND_CE1_B__GPIO4_IO14        0x100b0
++                 >;
++        };
++ 
+ 	pinctrl_adc1: adc1grp {
+ 		fsl,pins = <
+ 			MX6UL_PAD_GPIO1_IO00__GPIO1_IO00        0x3000 /* SODIMM 8 */
+@@ -322,7 +380,7 @@ MX6UL_PAD_GPIO1_IO09__GPIO1_IO09        0x3000 /* SODIMM 2 */
+ 
+ 	pinctrl_atmel_adap: atmeladapgrp {
+ 		fsl,pins = <
+-			MX6UL_PAD_NAND_DQS__GPIO4_IO16          0xb0a0  /* SODIMM 28 */
++		/*	MX6UL_PAD_NAND_DQS__GPIO4_IO16          0xb0a0  */  /* SODIMM 28 */  /*deepak*/
+ 			MX6UL_PAD_ENET1_TX_EN__GPIO2_IO05       0xb0a0  /* SODIMM 30 */
+ 		>;
+ 	};
+@@ -399,7 +457,7 @@ MX6UL_PAD_ENET1_RX_EN__FLEXCAN2_TX	0x1b020
+ 
+ 	pinctrl_gpio_bl_on: gpioblongrp {
+ 		fsl,pins = <
+-			MX6UL_PAD_JTAG_TMS__GPIO1_IO11		0x30a0	/* SODIMM 71 */
++			MX6UL_PAD_JTAG_TMS__GPIO1_IO11		0x30a0      	/* SODIMM 71 */  
+ 		>;
+ 	};
+ 
+@@ -407,7 +465,8 @@ pinctrl_gpio1: gpio1grp {
+ 		fsl,pins = <
+ 			MX6UL_PAD_UART3_RX_DATA__GPIO1_IO25	0x10b0 /* SODIMM 77 */
+ 			MX6UL_PAD_JTAG_TCK__GPIO1_IO14		0x70a0 /* SODIMM 99 */
+-			MX6UL_PAD_NAND_CE1_B__GPIO4_IO14	0x10b0 /* SODIMM 133 */
++			MX6UL_PAD_NAND_CE1_B__GPIO4_IO14	0x10b0   /* SODIMM 133 */ 
++        /*              MX6UL_PAD_NAND_CE1_B__GPIO4_IO14        0x50a0  */ /*push button*/   /*deepak*/
+ 			MX6UL_PAD_UART3_TX_DATA__GPIO1_IO24	0x10b0 /* SODIMM 135 */
+ 			MX6UL_PAD_UART3_CTS_B__GPIO1_IO26	0x10b0 /* SODIMM 100 */
+ 			MX6UL_PAD_JTAG_TRST_B__GPIO1_IO15	0x70a0 /* SODIMM 102 */
+@@ -420,9 +479,9 @@ pinctrl_gpio2: gpio2grp { /* Camera */
+ 		fsl,pins = <
+ 			MX6UL_PAD_CSI_DATA04__GPIO4_IO25	0x10b0 /* SODIMM 69 */
+ 			MX6UL_PAD_CSI_MCLK__GPIO4_IO17		0x10b0 /* SODIMM 75 */
+-			MX6UL_PAD_CSI_DATA06__GPIO4_IO27	0x10b0 /* SODIMM 85 */
+-			MX6UL_PAD_CSI_PIXCLK__GPIO4_IO18	0x10b0 /* SODIMM 96 */
+-			MX6UL_PAD_CSI_DATA05__GPIO4_IO26	0x10b0 /* SODIMM 98 */
++       			MX6UL_PAD_CSI_DATA06__GPIO4_IO27	0x10b0  /* SODIMM 85 */
++			MX6UL_PAD_CSI_PIXCLK__GPIO4_IO18	0x10b0  /* SODIMM 96 */
++			MX6UL_PAD_CSI_DATA05__GPIO4_IO26	0x10b0  /* SODIMM 98 */   
+ 		>;
+ 	};
+ 
+@@ -435,7 +494,7 @@ MX6UL_PAD_ENET1_TX_DATA0__GPIO2_IO03	0x10b0 /* SODIMM 188 */
+ 
+ 	pinctrl_gpio4: gpio4grp {
+ 		fsl,pins = <
+-			MX6UL_PAD_CSI_DATA07__GPIO4_IO28	0x10b0 /* SODIMM 65 */
++			MX6UL_PAD_CSI_DATA07__GPIO4_IO28	0x10b0    /* SODIMM 65 */  
+ 		>;
+ 	};
+ 
+@@ -446,14 +505,14 @@ MX6UL_PAD_CSI_DATA02__GPIO4_IO23	0x10b0 /* SODIMM 79 */
+ 			MX6UL_PAD_CSI_VSYNC__GPIO4_IO19		0x10b0 /* SODIMM 81 */
+ 			MX6UL_PAD_CSI_DATA03__GPIO4_IO24	0x10b0 /* SODIMM 97 */
+ 			MX6UL_PAD_CSI_DATA00__GPIO4_IO21	0x10b0 /* SODIMM 101 */
+-			MX6UL_PAD_CSI_DATA01__GPIO4_IO22	0x10b0 /* SODIMM 103 */
++			MX6UL_PAD_CSI_DATA01__GPIO4_IO22	0x10b0  /* SODIMM 103 */  
+ 			MX6UL_PAD_CSI_HSYNC__GPIO4_IO20		0x10b0 /* SODIMM 94 */
+ 		>;
+ 	};
+ 
+ 	pinctrl_gpio7: gpio7grp { /* CAN1 */
+ 		fsl,pins = <
+-			MX6UL_PAD_ENET1_RX_DATA0__GPIO2_IO00	0xb0b0/* SODIMM 55 */
++			MX6UL_PAD_ENET1_RX_DATA0__GPIO2_IO00	0xb0b0   /* SODIMM 55 */ /*deepak*/
+ 			MX6UL_PAD_ENET1_RX_DATA1__GPIO2_IO01	0xb0b0 /* SODIMM 63 */
+ 		>;
+ 	};
+@@ -649,7 +708,7 @@ MX6UL_PAD_SD1_DATA3__USDHC1_DATA3	0x170f9
+ 	pinctrl_usdhc2: usdhc2grp {
+ 		fsl,pins = <
+ 			MX6UL_PAD_CSI_DATA00__USDHC2_DATA0	0x17069
+-			MX6UL_PAD_CSI_DATA01__USDHC2_DATA1	0x17069
++	        	MX6UL_PAD_CSI_DATA01__USDHC2_DATA1	0x17069  
+ 			MX6UL_PAD_CSI_DATA02__USDHC2_DATA2	0x17069
+ 			MX6UL_PAD_CSI_DATA03__USDHC2_DATA3	0x17069
+ 			MX6UL_PAD_CSI_HSYNC__USDHC2_CMD		0x17069
+@@ -682,6 +741,13 @@ MX6UL_PAD_LCD_RESET__WDOG1_WDOG_ANY    0x30b0
+ };
+ 
+ &iomuxc_snvs {
++                                                                    /*keypad INT*/
++     /*    intr_key_gpio4: intr_gpio4_16 {                     
++                fsl,pins = <
++                         MX6UL_PAD_NAND_DQS__GPIO4_IO16          0xb0a0     
++                 >;
++        }; */
++
+ 	pinctrl_atmel_snvs_conn: atmelsnvsconngrp {
+ 		fsl,pins = <
+ 			MX6ULL_PAD_SNVS_TAMPER4__GPIO5_IO04     0xb0a0	/* SODIMM 107 */
+diff --git a/arch/arm/configs/imx_v6_v7_defconfig b/arch/arm/configs/imx_v6_v7_defconfig
+index 078d61b758a9..cdaea47855d7 100644
+--- a/arch/arm/configs/imx_v6_v7_defconfig
++++ b/arch/arm/configs/imx_v6_v7_defconfig
+@@ -471,3 +471,7 @@ CONFIG_DEBUG_FS=y
+ # CONFIG_SCHED_DEBUG is not set
+ CONFIG_PROVE_LOCKING=y
+ # CONFIG_FTRACE is not set
++CONFIG_KEYBOARD_TCA8418=y
++CONFIG_SI7020=y
++CONFIG_MMA8452=y
++CONFIG_MCP4725=y
